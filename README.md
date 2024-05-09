@@ -72,3 +72,23 @@ results.forEach((k, v) -> {
 ```
 
 The `UniProtIdLocalMapper` constructor only takes a `.dat` file with the UniProt mapping data.
+
+The database names in such `.dat` files are automatically mapped to `UniProtDbFrom` or `UniProtDbTo` when they have the same names than in the REST API. However, some names are different and are mapped directly, according to the following table:
+
+| .dat file              | enum constant                     |
+|------------------------|-----------------------------------|
+| EMBL-CDS               | EMBL_GENBANK_DDBJ_CDS             |
+| EMBL                   | EMBL_GENBANK_DDBJ                 |
+| EnsemblGenome_PRO      | ENSEMBL_GENOMES_PROTEIN           |
+| EnsemblGenome_TRS      | ENSEMBL_GENOMES_TRANSCRIPT        |
+| EnsemblGenome          | ENSEMBL_GENOMES                   |
+| Ensembl_PRO            | ENSEMBL_PROTEIN                   |
+| Ensembl_TRS            | ENSEMBL_TRANSCRIPT                |
+| Ensembl                | ENSEMBL                           |
+| GI                     | GI_NUMBER                         |
+| RefSeq                 | REFSEQ_PROTEIN                    |
+| RefSeq_NT              | REFSEQ_NUCLEOTIDE                 |
+| UniProtKB_AC-ID        | UniProtDbFrom.UNIPROTKB_AC_ID     |
+| UniProtKB-ID           | UniProtDbTo.UNIPROTKB             |
+
+Finally, other DB names that appear in the file but do not have a correspondence to a known REST API database are ommitted. These are: EMDB, Gene_ORFName, Gene_Synonym, MINT, and NCBI_TaxID.
