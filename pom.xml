@@ -6,6 +6,7 @@
 	<groupId>org.sing_group</groupId>
 	<artifactId>uniprot-id-mapping</artifactId>
 	<version>1.0.0</version>
+	<inceptionYear>2024</inceptionYear>
 
 	<name>UniProt ID Mapping</name>
 	<description>UniProt ID Mapping in Java</description>
@@ -58,6 +59,12 @@
 		<junit.version>4.12</junit.version>
 
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+
+		<!-- License configuration -->
+		<license.licenseName>mit</license.licenseName>
+		<license.copyrightOwners>Hugo López-Fernández</license.copyrightOwners>
+		<license.organizationName>SING Group (University of Vigo)</license.organizationName>
+		<license.addJavaLicenseAfterPackage>false</license.addJavaLicenseAfterPackage>
 	</properties>
 
 	<dependencies>
@@ -100,7 +107,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${maven-jar-plugin.version}</version>
 				<configuration>
-					<finalName>${artifactId}-${project.version}</finalName>
+					<finalName>${project.artifactId}-${project.version}</finalName>
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
@@ -117,6 +124,28 @@
 						<include>**/*Test.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.8</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/logback.xml</exclude>
+                    </excludes>
+                </configuration>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
