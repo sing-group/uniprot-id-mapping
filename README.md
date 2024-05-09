@@ -52,3 +52,23 @@ The `UniProtBatchProcessor` constructor takes three arguments:
 - `batchSize`: the maximum number of IDs in every single query. Larger lists will be divided in several queries.
 - `client`: an `UniProtClient` instance.
 - `cache`: an object that implements the `IdCache`. There are two implementations: `VolatileIdCache` and `PersistentIdCache`.
+
+## 3. Local mapper
+
+As UniProt provides the underlying data files uing by the web service, the `UniProtIdLocalMapper` allows using them for mapping identifiers locally. It can be used as follows:
+
+```java
+UniProtIdLocalMapper localMapper = new UniProtIdLocalMapper(
+    new File("src/test/resources/DROME_7227_idmapping_subset.dat"));
+
+Map<String, List<String>> results = localMapper.mapIds(
+    UniProtDbFrom.UNIPROTKB_AC_ID,
+    UniProtDbTo.GENEID,
+    "P32234", "P92177");
+
+results.forEach((k, v) -> {
+    System.out.println(k + " -> " + v + " (" + v.size() + ")");
+});
+```
+
+The `UniProtIdLocalMapper` constructor only takes a `.dat` file with the UniProt mapping data.

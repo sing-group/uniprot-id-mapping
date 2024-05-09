@@ -128,10 +128,13 @@ public class UniProtIdLocalMapper implements UniProtIdMapper {
   
   public static void main(String[] args) throws IOException {
     UniProtIdLocalMapper localMapper = new UniProtIdLocalMapper(
-        new File("/home/hlfernandez/Descargas/DROME_7227_idmapping.dat"));
+        new File("src/test/resources/DROME_7227_idmapping_subset.dat"));
 
-    Map<String, List<String>> results = localMapper.mapIds(UniProtDbFrom.UNIPROTKB_AC_ID, UniProtDbTo.GENEID,
-        Arrays.asList(new String[] { "O77134", "P92177", "Q7KN62" }));
+    Map<String, List<String>> results = localMapper.mapIds(
+        UniProtDbFrom.UNIPROTKB_AC_ID,
+        UniProtDbTo.GENEID,
+        "P32234", "P92177");
+
     results.forEach((k, v) -> {
       System.out.println(k + " -> " + v + " (" + v.size() + ")");
     });
