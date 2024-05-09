@@ -2,7 +2,33 @@
 
 This projet provides `uniprot-id-mapping`, a Java API client for the [UniProt ID Mapping service](https://www.uniprot.org/id-mapping/).
 
-## 1. Basic client
+# Maven dependency
+
+To include `uniprot-id-mapping` in your project, add our repository to the `pom.xml` first:
+
+```xml
+<repositories>
+    <repository>
+        <id>sing-maven-releases</id>
+        <name>SING Maven Releases</name>
+        <url>https://maven.sing-group.org/repository/maven-releases/</url>
+    </repository>
+</repositories>
+```
+
+And then add the corresponding dependency:
+
+```xml
+<dependency>
+    <groupId>org.sing_group</groupId>
+	<artifactId>uniprot-id-mapping</artifactId>
+	<version>1.0.0</version>
+</dependency>
+```
+
+# Use cases
+
+## 1. Basic UniProt remote client
 
 The core client is implemented by the `UniProtClient` class. It can be used as follows:
 
@@ -25,7 +51,7 @@ if (job.getStatus().equals(JobStatus.FINISHED)) {
 
 The `mapIds` method returns a `UniProtJob` instance that can be queried to retrieve job ID, job status and, when available, the mapping results. The source and target conversion databases are specified by enums `UniProtDbFrom` and `UniProtDbTo` respectively.
 
-## 2. Advanced client
+## 2. Advanced remote client
 
 The advanced client is implemented by the `UniProtBatchProcessor` class, which uses the `UniProtClient` internally to provide batch processing and allowing the use of a cache to avoid repeating queries. It can be used as follows:
 
