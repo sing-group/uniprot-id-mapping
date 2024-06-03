@@ -114,7 +114,8 @@ The database names in such `.dat` files are automatically mapped to `UniProtDbFr
 | GI                     | GI_NUMBER                         |
 | RefSeq                 | REFSEQ_PROTEIN                    |
 | RefSeq_NT              | REFSEQ_NUCLEOTIDE                 |
+| Gene_ORFName           | GENE_NAME                         |
 | UniProtKB_AC-ID        | UniProtDbFrom.UNIPROTKB_AC_ID     |
 | UniProtKB-ID           | UniProtDbTo.UNIPROTKB             |
 
-Finally, other DB names that appear in the file but do not have a correspondence to a known REST API database are ommitted. These are: EMDB, Gene_ORFName, Gene_Synonym, MINT, and NCBI_TaxID.
+Finally, other DB names that appear in the file but do not have a correspondence to a known REST API database are ommitted. These are: EMDB, Gene_Synonym, MINT, and NCBI_TaxID.
