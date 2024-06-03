@@ -149,6 +149,7 @@ public enum UniProtDbTo {
   private static final Map<String, UniProtDbTo> MAPPINGS = new HashMap<>();
 
   static { 
+    MAPPINGS.put("Gene_ORFName", UniProtDbTo.GENE_NAME);
     MAPPINGS.put("EMBL-CDS", UniProtDbTo.EMBL_GENBANK_DDBJ_CDS);
     MAPPINGS.put("EMBL", UniProtDbTo.EMBL_GENBANK_DDBJ);
     MAPPINGS.put("EnsemblGenome_PRO", UniProtDbTo.ENSEMBL_GENOMES_PROTEIN);
