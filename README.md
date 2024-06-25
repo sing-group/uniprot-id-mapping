@@ -90,7 +90,8 @@ UniProtIdLocalMapper localMapper = new UniProtIdLocalMapper(
 Map<String, List<String>> results = localMapper.mapIds(
     UniProtDbFrom.UNIPROTKB_AC_ID,
     UniProtDbTo.GENEID,
-    "P32234", "P92177");
+    "P32234", "P92177"
+);
 
 results.forEach((k, v) -> {
     System.out.println(k + " -> " + v + " (" + v.size() + ")");
@@ -119,3 +120,24 @@ The database names in such `.dat` files are automatically mapped to `UniProtDbFr
 | UniProtKB-ID           | UniProtDbTo.UNIPROTKB             |
 
 Finally, other DB names that appear in the file but do not have a correspondence to a known REST API database are ommitted. These are: EMDB, Gene_Synonym, MINT, and NCBI_TaxID.
+
+### 3.1 Mapping versioned identifiers
+
+Some identifiers include a version number. For instance, this happens with `ENSMUSG*` identifiers like `ENSMUSG00000017843.15`. When using the remote mapping, it is possible to map an identifier like `ENSMUSG00000017843` from `Ensemble` into `UniProtKB-ID` and obtain the corresponding hits (`Q60996`, `A0A1Y7VIR0` and `A0A1Y7VJC8` as of 25th June 2024). However, this identifier appears as `ENSMUSG00000017843.15` in the local mapping files. To make the `UniProtIdLocalMapper` behave like the remote mapper with such identifiers, a new constructor parameter was added in version `1.2.0`:
+
+```java
+UniProtIdLocalMapper localMapper = new UniProtIdLocalMapper(
+    new File("src/test/resources/MOUSE_10090_idmapping_subset.dat"),
+    true // Adds deversioned identifiers into the mappings
+);
+
+Map<String, List<String>> results = localMapper.mapIds(
+    UniProtDbFrom.ENSEMBL,
+    UniProtDbTo.UNIPROTKB,
+    "ENSMUSG00000017843"
+);
+
+results.forEach((k, v) -> {
+    System.out.println(k + " -> " + v + " (" + v.size() + ")");
+});
+```

@@ -26,6 +26,7 @@
 package org.sing_group.uniprot_id_mapping;
 
 import static java.util.Arrays.asList;
+import static org.sing_group.uniprot_id_mapping.UniProtDbFrom.ENSEMBL;
 import static org.sing_group.uniprot_id_mapping.UniProtDbFrom.FLYBASE;
 import static org.sing_group.uniprot_id_mapping.UniProtDbFrom.UNIPROTKB_AC_ID;
 import static org.sing_group.uniprot_id_mapping.UniProtDbTo.GENEID;
@@ -40,15 +41,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class UniProtIdLocalMapperTest {
-  private UniProtIdLocalMapper mapper;
+  private UniProtIdLocalMapper drosophilaMapper;
   
   public UniProtIdLocalMapperTest() throws IOException {
-    this.mapper = new UniProtIdLocalMapper(new File("src/test/resources/DROME_7227_idmapping_subset.dat"));
+    this.drosophilaMapper = new UniProtIdLocalMapper(new File("src/test/resources/DROME_7227_idmapping_subset.dat"));
   }
 
   @Test
   public void testMapFlyBaseToUniProtKb() {
-    Map<String, List<String>> result = mapper.mapIds(FLYBASE, UNIPROTKB, "FBgn0010339", "FBgn0010340");
+    Map<String, List<String>> result = drosophilaMapper.mapIds(FLYBASE, UNIPROTKB, "FBgn0010339", "FBgn0010340");
 
     Assert.assertEquals(asList("P32234"), result.get("FBgn0010339"));
     Assert.assertEquals(asList("P81928", "A0A0B4KFZ0"), result.get("FBgn0010340"));
@@ -56,9 +57,27 @@ public class UniProtIdLocalMapperTest {
 
   @Test
   public void testMapUniProtKbToGeneId() throws IOException {
-    Map<String, List<String>> result = mapper.mapIds(UNIPROTKB_AC_ID, GENEID, "P32234", "P81928");
+    Map<String, List<String>> result = drosophilaMapper.mapIds(UNIPROTKB_AC_ID, GENEID, "P32234", "P81928");
 
     Assert.assertEquals(asList("36288"), result.get("P32234"));
     Assert.assertEquals(asList("41720"), result.get("P81928"));
+  }
+
+  @Test
+  public void testMapEnsemblToUniProtKbWithoutDeversioning() throws IOException {
+    UniProtIdLocalMapper musMusculusMapper = new UniProtIdLocalMapper(new File("src/test/resources/MOUSE_10090_idmapping_subset.dat"));
+    Map<String, List<String>> result = musMusculusMapper.mapIds(ENSEMBL, UNIPROTKB, "ENSMUSG00000017843");
+
+    Assert.assertTrue(result.isEmpty());
+  }
+
+  @Test
+  public void testMapEnsemblToUniProtKbWithDeversioning() throws IOException {
+    UniProtIdLocalMapper musMusculusMapper = new UniProtIdLocalMapper(new File("src/test/resources/MOUSE_10090_idmapping_subset.dat"), true);
+    Map<String, List<String>> result = musMusculusMapper.mapIds(ENSEMBL, UNIPROTKB, "ENSMUSG00000017843", "ENSMUSG00000017843.15");
+
+    Assert.assertFalse(result.isEmpty());
+    Assert.assertEquals(asList("Q60996", "A0A1Y7VIR0", "A0A1Y7VJC8"), result.get("ENSMUSG00000017843"));
+    Assert.assertEquals(asList("Q60996", "A0A1Y7VIR0", "A0A1Y7VJC8"), result.get("ENSMUSG00000017843.15"));
   }
 }

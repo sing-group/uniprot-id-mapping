@@ -25,6 +25,8 @@
  */
 package org.sing_group.uniprot_id_mapping;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,14 +51,24 @@ public class UniProtIdLocalMapper implements UniProtIdMapper {
   private static final Logger LOGGER = LoggerFactory.getLogger(UniProtIdLocalMapper.class);
 
   private InputStream uniprotMappingDatStream;
+  private boolean addsDeVersionedIdentifiers;
   private Map<UniProtDbFrom, Map<String, Map<UniProtDbTo, List<String>>>> dbMapping;
 
   public UniProtIdLocalMapper(File uniprotMappingDatFile) throws IOException {
-    this(new FileInputStream(uniprotMappingDatFile));
+    this(uniprotMappingDatFile, false);
+  }
+
+  public UniProtIdLocalMapper(File uniprotMappingDatFile, boolean addsDeVersionedIdentifiers) throws IOException {
+    this(new FileInputStream(uniprotMappingDatFile), addsDeVersionedIdentifiers);
   }
 
   public UniProtIdLocalMapper(InputStream uniprotMappingDatStream) throws IOException {
+    this(uniprotMappingDatStream, false);
+  }
+
+  public UniProtIdLocalMapper(InputStream uniprotMappingDatStream, boolean addsDeVersionedIdentifiers) throws IOException {
     this.uniprotMappingDatStream = uniprotMappingDatStream;
+    this.addsDeVersionedIdentifiers = addsDeVersionedIdentifiers;
     this.createMaps();
   }
 
@@ -67,6 +79,15 @@ public class UniProtIdLocalMapper implements UniProtIdMapper {
           ForkJoinPool customThreadPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
           customThreadPool.submit(() -> lines.parallel().forEach(this::processLine)).join();
       }
+  }
+
+  private String deversion(String id) {
+    if (id.contains(".")) {
+      String[] split = id.split("\\.");
+      return Arrays.stream(split).limit(split.length - 1).collect(joining("."));
+    } else {
+      return id;
+    }
   }
 
   private void processLine(String line) {
@@ -100,6 +121,14 @@ public class UniProtIdLocalMapper implements UniProtIdMapper {
               .computeIfAbsent(dbID, k -> new ConcurrentHashMap<>())
               .computeIfAbsent(UniProtDbTo.UNIPROTKB, k -> Collections.synchronizedList(new LinkedList<>()))
               .add(uniprotKbID);
+
+      if(this.addsDeVersionedIdentifiers) {
+        String deversionedDbID = deversion(dbID);
+        dbMapping.computeIfAbsent(optionalDbFrom.get(), k -> new ConcurrentHashMap<>())
+          .computeIfAbsent(deversionedDbID, k -> new ConcurrentHashMap<>())
+          .computeIfAbsent(UniProtDbTo.UNIPROTKB, k -> Collections.synchronizedList(new LinkedList<>()))
+          .add(uniprotKbID);
+      }
   }
 
   private Stream<String> readFile() throws IOException {
@@ -133,10 +162,26 @@ public class UniProtIdLocalMapper implements UniProtIdMapper {
     Map<String, List<String>> results = localMapper.mapIds(
         UniProtDbFrom.UNIPROTKB_AC_ID,
         UniProtDbTo.GENEID,
-        "P32234", "P92177");
+        "P32234", "P92177"
+      );
 
     results.forEach((k, v) -> {
       System.out.println(k + " -> " + v + " (" + v.size() + ")");
+    });
+
+    localMapper = new UniProtIdLocalMapper(
+        new File("src/test/resources/MOUSE_10090_idmapping_subset.dat"),
+        true // Adds deversioned identifiers into the mappings
+    );
+
+    results = localMapper.mapIds(
+        UniProtDbFrom.ENSEMBL,
+        UniProtDbTo.UNIPROTKB,
+        "ENSMUSG00000017843"
+      );
+
+    results.forEach((k, v) -> {
+        System.out.println(k + " -> " + v + " (" + v.size() + ")");
     });
   }
 }
